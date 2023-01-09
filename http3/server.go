@@ -220,7 +220,7 @@ func (s *Server) ListenAndServe() error {
 //		  }
 //	   h3s.ListenServe()
 func (s *Server) ListenServe() error {
-	s.TLSConfig = ConfigureTLSConfig(s.TLSConfig)
+	s.TLSConfig.GetConfigForClient = ConfigureTLSConfig(s.TLSConfig).GetConfigForClient
 	var addr = s.Addr
 	//addr, certFile, keyFile string
 	var handler http.Handler = s.Handler
