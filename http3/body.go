@@ -2,6 +2,7 @@ package http3
 
 import (
 	"context"
+	"github.com/hktalent/quic-go"
 	"io"
 	"net"
 )
