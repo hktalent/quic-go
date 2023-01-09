@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/hktalent/quic-go"
 	"io"
 	"net/http"
 	"strings"

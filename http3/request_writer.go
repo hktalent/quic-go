@@ -3,6 +3,7 @@ package http3
 import (
 	"bytes"
 	"fmt"
+	"github.com/hktalent/quic-go"
 	"io"
 	"net"
 	"net/http"
