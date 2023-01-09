@@ -208,7 +208,6 @@ func (s *Server) ListenAndServe() error {
 
 // use Addr、TLSConfig
 //
-//		default call s.TLSConfig = ConfigureTLSConfig(s.TLSConfig)
 //		NextProtos = []string{proto, "h2", "http/1.1"}
 //	 example:
 //	  h3s := http3.Server{
@@ -220,7 +219,6 @@ func (s *Server) ListenAndServe() error {
 //		  }
 //	   h3s.ListenServe()
 func (s *Server) ListenServe() error {
-	s.TLSConfig.GetConfigForClient = ConfigureTLSConfig(s.TLSConfig).GetConfigForClient
 	var addr = s.Addr
 	//addr, certFile, keyFile string
 	var handler http.Handler = s.Handler
