@@ -1,9 +1,9 @@
 package ackhandler
 
 import (
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	list "github.com/lucas-clemente/quic-go/internal/utils/linkedlist"
-	"github.com/lucas-clemente/quic-go/internal/wire"
+	"github.com/hktalent/quic-go/internal/protocol"
+	list "github.com/hktalent/quic-go/internal/utils/linkedlist"
+	"github.com/hktalent/quic-go/internal/wire"
 )
 
 // interval is an interval from one PacketNumber to the other

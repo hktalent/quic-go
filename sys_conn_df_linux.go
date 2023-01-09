@@ -6,7 +6,7 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/lucas-clemente/quic-go/internal/utils"
+	"github.com/hktalent/quic-go/internal/utils"
 	"golang.org/x/sys/unix"
 )
 

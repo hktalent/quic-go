@@ -4,8 +4,6 @@ import (
 	"context"
 	"io"
 	"net"
-
-	"github.com/lucas-clemente/quic-go"
 )
 
 // The HTTPStreamer allows taking over a HTTP/3 stream. The interface is implemented by:

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/quicvarint"
+	"github.com/hktalent/quic-go/internal/protocol"
+	"github.com/hktalent/quic-go/quicvarint"
 )
 
 // A DatagramFrame is a DATAGRAM frame

@@ -11,8 +11,6 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-
-	"github.com/lucas-clemente/quic-go"
 )
 
 const h09alpn = "hq-interop"

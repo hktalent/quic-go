@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/hktalent/quic-go"
 	"io"
 	"net"
 	"net/http"
@@ -13,11 +14,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lucas-clemente/quic-go"
-	"github.com/lucas-clemente/quic-go/internal/handshake"
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/utils"
-	"github.com/lucas-clemente/quic-go/quicvarint"
+	"github.com/hktalent/quic-go/internal/handshake"
+	"github.com/hktalent/quic-go/internal/protocol"
+	"github.com/hktalent/quic-go/internal/utils"
+	"github.com/hktalent/quic-go/quicvarint"
 	"github.com/marten-seemann/qpack"
 )
 
@@ -84,7 +84,7 @@ func ConfigureTLSConfig(tlsConf *tls.Config) *tls.Config {
 				return nil, nil
 			}
 			config = config.Clone()
-			config.NextProtos = []string{proto}
+			config.NextProtos = []string{proto, "h2", "http/1.1"}
 			return config, nil
 		},
 	}
@@ -204,6 +204,87 @@ type Server struct {
 // If s.Addr is blank, ":https" is used.
 func (s *Server) ListenAndServe() error {
 	return s.serveConn(s.TLSConfig, nil)
+}
+
+// use Addr、TLSConfig
+//
+//		default call s.TLSConfig = ConfigureTLSConfig(s.TLSConfig)
+//		NextProtos = []string{proto, "h2", "http/1.1"}
+//	 example:
+//	  h3s := http3.Server{
+//				Addr:            addr,
+//				EnableDatagrams: true,
+//				Handler:         router.Handler(),
+//				TLSConfig:       util1.GTls,
+//				QuicConfig:      &quic.Config{EnableDatagrams: true},
+//		  }
+//	   h3s.ListenServe()
+func (s *Server) ListenServe() error {
+	s.TLSConfig = ConfigureTLSConfig(s.TLSConfig)
+	var addr = s.Addr
+	//addr, certFile, keyFile string
+	var handler http.Handler = s.Handler
+	// Load certs
+	var err error
+	config := s.TLSConfig
+
+	if addr == "" {
+		addr = ":https"
+	}
+
+	// Open the listeners
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
+	if err != nil {
+		return err
+	}
+	udpConn, err := net.ListenUDP("udp", udpAddr)
+	if err != nil {
+		return err
+	}
+	defer udpConn.Close()
+
+	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
+	if err != nil {
+		return err
+	}
+	tcpConn, err := net.ListenTCP("tcp", tcpAddr)
+	if err != nil {
+		return err
+	}
+	defer tcpConn.Close()
+
+	tlsConn := tls.NewListener(tcpConn, config)
+	defer tlsConn.Close()
+
+	if handler == nil {
+		handler = http.DefaultServeMux
+	}
+	// Start the servers
+	httpServer := &http.Server{
+		TLSConfig: s.TLSConfig,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			s.SetQuicHeaders(w.Header())
+			handler.ServeHTTP(w, r)
+		}),
+	}
+
+	hErr := make(chan error)
+	qErr := make(chan error)
+	go func() {
+		hErr <- httpServer.Serve(tlsConn)
+	}()
+	go func() {
+		qErr <- s.Serve(udpConn)
+	}()
+
+	select {
+	case err := <-hErr:
+		s.Close()
+		return err
+	case err := <-qErr:
+		// Cannot close the HTTP server or wait for requests to complete properly :/
+		return err
+	}
 }
 
 // ListenAndServeTLS listens on the UDP address s.Addr and calls s.Handler to handle HTTP/3 requests on incoming connections.

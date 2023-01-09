@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/utils"
-	"github.com/lucas-clemente/quic-go/logging"
+	"github.com/hktalent/quic-go/internal/protocol"
+	"github.com/hktalent/quic-go/internal/utils"
+	"github.com/hktalent/quic-go/logging"
 )
 
 type client struct {

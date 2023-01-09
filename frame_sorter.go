@@ -3,8 +3,8 @@ package quic
 import (
 	"errors"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	list "github.com/lucas-clemente/quic-go/internal/utils/linkedlist"
+	"github.com/hktalent/quic-go/internal/protocol"
+	list "github.com/hktalent/quic-go/internal/utils/linkedlist"
 )
 
 // byteInterval is an interval from one ByteCount to the other
